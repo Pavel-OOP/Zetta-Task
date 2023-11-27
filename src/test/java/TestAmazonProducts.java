@@ -42,8 +42,10 @@ public class TestAmazonProducts {
         List<WebElement> allProducts = driver.findElements(By.cssSelector(".s-main-slot.s-result-list.s-search-results.sg-row > div > .sg-col-inner > div"));
         int removeLastEle = allProducts.size() - 1;
         allProducts.remove(removeLastEle);
+        allProducts.remove(allProducts.size()-1);
 
-        List<WebElement> nonDiscountedProducts = new ArrayList<>();
+
+        ArrayList<String> nonDiscountedUrls = new ArrayList<>();
 
         int allEle = 0;
         int nonDiscountedEle = 0;
@@ -53,37 +55,18 @@ public class TestAmazonProducts {
             }catch (org.openqa.selenium.NoSuchElementException e){
                 nonDiscountedEle++;
                 ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
-                try{
-                    Thread.sleep(500);
-                }catch (InterruptedException ex){
-                    System.out.println("Thread interrupted: 2");
-                }
-                wait.until(ExpectedConditions.visibilityOf(element));
-                WebElement ele = element.findElement(By.cssSelector("a"));
-                nonDiscountedProducts.add(ele);
+                // wait.until(ExpectedConditions.visibilityOf(element));
+                String url = element.findElement(By.cssSelector("a")).getAttribute("href");
+                nonDiscountedUrls.add(url);
             }
-
-
-//            if (!isDisplayed(element.findElement(By.cssSelector("span.a-price.a-text-price")))){
-//                nonDiscountedEle++;
-//                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
-//                try{
-//                    Thread.sleep(500);
-//                }catch (InterruptedException e){
-//                    System.out.println("Thread interrupted: 2");
-//                }
-//                wait.until(ExpectedConditions.visibilityOf(element));
-//                WebElement ele = element.findElement(By.cssSelector("a"));
-//                nonDiscountedProducts.add(ele);
-//            }
             allEle++;
         }
+
         System.out.println(allEle);
         System.out.println(nonDiscountedEle);
-
-        for(WebElement element : nonDiscountedProducts){
-            String testHref = element.getAttribute("href");
-            System.out.println(testHref);
+        for (String url : nonDiscountedUrls){
+            driver.get(url);
+            driver.findElement(By.id("add-to-cart-button")).click();
         }
 
     }
@@ -91,13 +74,5 @@ public class TestAmazonProducts {
     @After
     public void cleanUp(){
         driver.quit();
-    }
-
-    public boolean isDisplayed(WebElement element) {
-        try {
-            return element.isDisplayed();
-        } catch (NoSuchElementException e) {
-            return false;
-        }
     }
 }
