@@ -1,4 +1,5 @@
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.*;
@@ -8,6 +9,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TestAmazonProducts {
@@ -64,10 +66,24 @@ public class TestAmazonProducts {
 
         System.out.println(allEle);
         System.out.println(nonDiscountedEle);
+        ArrayList<String> laptopNames = new ArrayList<>();
         for (String url : nonDiscountedUrls){
             driver.get(url);
+            String laptopName = driver.findElement(By.id("productTitle")).getText();
+            laptopNames.add(laptopName);
             driver.findElement(By.id("add-to-cart-button")).click();
         }
+
+        Collections.reverse(laptopNames);
+
+        driver.findElement(By.id("nav-cart-count-container")).click();
+
+        List<WebElement> cartProducts = driver.findElements(By.cssSelector("span.a-truncate-cut"));
+        int counter = 0;
+        for (WebElement element : cartProducts){
+            Assert.assertEquals(element.getText(), laptopNames.get(counter++));
+        }
+
 
     }
 
