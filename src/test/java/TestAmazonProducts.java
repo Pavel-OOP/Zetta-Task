@@ -18,7 +18,7 @@ public class TestAmazonProducts {
     private WebDriverWait wait;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp(){
         driver = new ChromeDriver();
         url = "https://www.amazon.com/";
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
@@ -29,8 +29,10 @@ public class TestAmazonProducts {
     @Test
     public void nonDiscountedLaptops() {
         driver.get(url);
-        // in case of anti-bot, uncomment the timeSleep function and fill by hand
-        //timeSleep(15);
+        // in case of anti-bot, it loops until the challenge is completed by hand
+        while(!My.isNotDisplayed(By.cssSelector(".a-padding-extra-large"), driver)){
+            My.timeSleep(3);
+        }
         driver.findElement(By.cssSelector("input#twotabsearchtextbox")).sendKeys("laptop");
         driver.findElement(By.cssSelector("input#nav-search-submit-button")).click();
         driver.navigate().refresh();
@@ -41,7 +43,7 @@ public class TestAmazonProducts {
 //        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", secondPage);
 //        secondPage.click();
 //        driver.navigate().refresh();
-        timeSleep(1);
+        My.timeSleep(1);
 
         List<WebElement> allProducts = driver.findElements(By.cssSelector(".s-main-slot.s-result-list.s-search-results.sg-row > div > .sg-col-inner > div"));
         allProducts.remove(allProducts.size()-1);
@@ -64,7 +66,7 @@ public class TestAmazonProducts {
         }
 
         System.out.printf("Number of all products: %d%n", allEle);
-        System.out.printf("Number of discounted products: %d%n", nonDiscountedEle);
+        System.out.printf("Number of non-discounted products: %d%n", nonDiscountedEle);
 
         // Enter all non-discounted Laptops to the cart
         ArrayList<String> laptopNames = new ArrayList<>();
@@ -73,7 +75,7 @@ public class TestAmazonProducts {
             String laptopName = driver.findElement(By.id("productTitle")).getText();
             By ele = By.id("add-to-cart-button");
 
-            if(!isNotDisplayed(ele)){
+            if(!My.isNotDisplayed(ele, driver)){
                 laptopNames.add(laptopName);
                 driver.findElement(ele).click();
             }
@@ -88,8 +90,6 @@ public class TestAmazonProducts {
         for (WebElement element : cartProducts){
             Assert.assertEquals(element.getText().substring(0, 30), laptopNames.get(counter++).substring(0, 30));
         }
-
-
     }
 
     @After
@@ -97,14 +97,4 @@ public class TestAmazonProducts {
         driver.quit();
     }
 
-    public static void timeSleep(double seconds){
-        int intSeconds = (int) seconds * 1000;
-        try{
-            Thread.sleep(intSeconds);
-        }catch (InterruptedException ignore){}
-    }
-    public boolean isNotDisplayed(By selector){
-        List<WebElement> elements = driver.findElements(selector);
-        return elements.isEmpty();
-    }
 }
