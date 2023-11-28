@@ -29,26 +29,33 @@ public class TestAmazonCrawl {
     public void shopByDepartmentCrawl(){
         driver.get(url);
         // in case of anti-bot, it loops until the challenge is completed by hand
-        while(!My.isNotDisplayed(By.cssSelector(".a-padding-extra-large"), driver)){
-            My.timeSleep(3);
-        }
+        while(My.isDisplayed(By.cssSelector(".a-padding-extra-large"), driver)){}
+
         driver.findElement(By.id("nav-hamburger-menu")).click();
         WebElement seeAll = driver.findElement(By.cssSelector("li:nth-of-type(11) > .hmenu-compressed-btn.hmenu-item"));
         wait.until(ExpectedConditions.visibilityOf(seeAll));
         driver.findElement(By.cssSelector("li:nth-of-type(11) > .hmenu-compressed-btn.hmenu-item")).click();
 
-        List<WebElement> allParentLinks = new ArrayList<>();
+        List<WebElement> allMainLinks = new ArrayList<>();
+        ArrayList<String> urlData = new ArrayList<>();
         for (int i = 5; i <= 26; i++){
             WebElement ele = driver.findElement(By.cssSelector(String.format("[data-menu-id] [data-menu-id='%d']", i)));
-            allParentLinks.add(ele);
-
+            ele.click();
+            List<WebElement> allSubLinks = new ArrayList<>();
+            allSubLinks = driver.findElements(By.cssSelector(String.format("div#hmenu-content > .hmenu.hmenu-translateX.hmenu-visible > li > a", i)));
+            for (int j = 1; j < allSubLinks.size(); j++){
+                String link = allSubLinks.get(j).getAttribute("href");
+                urlData.add(My.requests(link));
+            }
+            wait.until(ExpectedConditions.visibilityOf(allSubLinks.get(0)));
+            allSubLinks.get(0).click();
         }
 
-        for (WebElement element : allParentLinks){
-           element.click();
+        for (String string : urlData){
+           System.out.println(string);
         }
 
-        //My.timeSleep(100);
+        My.timeSleep(100);
 
     }
 
@@ -56,4 +63,5 @@ public class TestAmazonCrawl {
     public void cleanUp(){
         driver.quit();
     }
+
 }

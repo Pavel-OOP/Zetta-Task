@@ -30,19 +30,11 @@ public class TestAmazonProducts {
     public void nonDiscountedLaptops() {
         driver.get(url);
         // in case of anti-bot, it loops until the challenge is completed by hand
-        while(!My.isNotDisplayed(By.cssSelector(".a-padding-extra-large"), driver)){
-            My.timeSleep(3);
-        }
+        while(My.isDisplayed(By.cssSelector(".a-padding-extra-large"), driver)){}
+
         driver.findElement(By.cssSelector("input#twotabsearchtextbox")).sendKeys("laptop");
         driver.findElement(By.cssSelector("input#nav-search-submit-button")).click();
         driver.navigate().refresh();
-        /* sometimes the first page had no discounted Laptops, in this case you can use the
-           second page by uncommenting the code below
-         */
-//        WebElement secondPage = driver.findElement(By.cssSelector("div[role='navigation'] > span > a:nth-of-type(1)"));
-//        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", secondPage);
-//        secondPage.click();
-//        driver.navigate().refresh();
         My.timeSleep(1);
 
         List<WebElement> allProducts = driver.findElements(By.cssSelector(".s-main-slot.s-result-list.s-search-results.sg-row > div > .sg-col-inner > div"));
@@ -75,7 +67,7 @@ public class TestAmazonProducts {
             String laptopName = driver.findElement(By.id("productTitle")).getText();
             By ele = By.id("add-to-cart-button");
 
-            if(!My.isNotDisplayed(ele, driver)){
+            if(My.isDisplayed(ele, driver)){
                 laptopNames.add(laptopName);
                 driver.findElement(ele).click();
             }

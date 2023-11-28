@@ -62,7 +62,7 @@ public class AmazonCrawler {
     }
 
 
-    public static void writeResults(ArrayList<String> array) {
+    public static void writeResults(String data) {
         Date date = new Date();
         Timestamp timeStamp = new Timestamp(date.getTime());
         String timestamp = TIME_STAMP_NEW.format(timeStamp);
@@ -74,9 +74,9 @@ public class AmazonCrawler {
             new File("tmp").mkdirs();
             File tempfile = new File(System.getProperty("user.dir") + File.separator + "tmp", filename);
             output = new BufferedWriter(new FileWriter(tempfile));
-            for(int i = 0; i < array.size(); i++) {
-                output.write("\n" + array.get(i) + "\n");
-            }
+
+            output.write(data);
+
         } catch ( IOException e ) {
             e.printStackTrace();
         } finally {
