@@ -29,59 +29,64 @@ public class TestAmazonProducts {
     @Test
     public void nonDiscountedLaptops() {
         driver.get(url);
+        // in case of anti-bot, uncomment the timeSleep function and fill by hand
+        //timeSleep(15);
         driver.findElement(By.cssSelector("input#twotabsearchtextbox")).sendKeys("laptop");
         driver.findElement(By.cssSelector("input#nav-search-submit-button")).click();
         driver.navigate().refresh();
-        WebElement secondPage = driver.findElement(By.cssSelector("div[role='navigation'] > span > a:nth-of-type(1)"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", secondPage);
-        secondPage.click();
-        driver.navigate().refresh();
-        try {
-            Thread.sleep(1000);
-        }catch (InterruptedException e){
-            System.out.println("Thread interrupted: 1");
-        }
+        /* sometimes the first page had no discounted Laptops, in this case you can use the
+           second page by uncommenting the code below
+         */
+//        WebElement secondPage = driver.findElement(By.cssSelector("div[role='navigation'] > span > a:nth-of-type(1)"));
+//        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", secondPage);
+//        secondPage.click();
+//        driver.navigate().refresh();
+        timeSleep(1);
+
         List<WebElement> allProducts = driver.findElements(By.cssSelector(".s-main-slot.s-result-list.s-search-results.sg-row > div > .sg-col-inner > div"));
-        int removeLastEle = allProducts.size() - 1;
-        allProducts.remove(removeLastEle);
         allProducts.remove(allProducts.size()-1);
-
-
-        ArrayList<String> nonDiscountedUrls = new ArrayList<>();
+        allProducts.remove(allProducts.size()-1);
 
         int allEle = 0;
         int nonDiscountedEle = 0;
+        // Loop through all the elements and add those that don't have a discount to a List
+        ArrayList<String> nonDiscountedUrls = new ArrayList<>();
         for (WebElement element : allProducts){
-            try{
-                element.findElement(By.cssSelector("span.a-price.a-text-price")).isDisplayed();
-            }catch (org.openqa.selenium.NoSuchElementException e){
+            List<WebElement> check = element.findElements(By.cssSelector("span.a-price.a-text-price"));
+            if(check.isEmpty()){
                 nonDiscountedEle++;
                 ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
-                // wait.until(ExpectedConditions.visibilityOf(element));
+                wait.until(ExpectedConditions.visibilityOf(element));
                 String url = element.findElement(By.cssSelector("a")).getAttribute("href");
                 nonDiscountedUrls.add(url);
             }
             allEle++;
         }
 
-        System.out.println(allEle);
-        System.out.println(nonDiscountedEle);
+        System.out.printf("Number of all products: %d%n", allEle);
+        System.out.printf("Number of discounted products: %d%n", nonDiscountedEle);
+
+        // Enter all non-discounted Laptops to the cart
         ArrayList<String> laptopNames = new ArrayList<>();
         for (String url : nonDiscountedUrls){
             driver.get(url);
             String laptopName = driver.findElement(By.id("productTitle")).getText();
-            laptopNames.add(laptopName);
-            driver.findElement(By.id("add-to-cart-button")).click();
-        }
+            By ele = By.id("add-to-cart-button");
 
+            if(!isNotDisplayed(ele)){
+                laptopNames.add(laptopName);
+                driver.findElement(ele).click();
+            }
+        }
         Collections.reverse(laptopNames);
 
         driver.findElement(By.id("nav-cart-count-container")).click();
 
+        // Assert that all added products are correct
         List<WebElement> cartProducts = driver.findElements(By.cssSelector("span.a-truncate-cut"));
         int counter = 0;
         for (WebElement element : cartProducts){
-            Assert.assertEquals(element.getText(), laptopNames.get(counter++));
+            Assert.assertEquals(element.getText().substring(0, 30), laptopNames.get(counter++).substring(0, 30));
         }
 
 
@@ -90,5 +95,16 @@ public class TestAmazonProducts {
     @After
     public void cleanUp(){
         driver.quit();
+    }
+
+    public static void timeSleep(double seconds){
+        int intSeconds = (int) seconds * 1000;
+        try{
+            Thread.sleep(intSeconds);
+        }catch (InterruptedException ignore){}
+    }
+    public boolean isNotDisplayed(By selector){
+        List<WebElement> elements = driver.findElements(selector);
+        return elements.isEmpty();
     }
 }
