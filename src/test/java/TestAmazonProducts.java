@@ -29,8 +29,8 @@ public class TestAmazonProducts {
     @Test
     public void nonDiscountedLaptops() {
         driver.get(url);
-        // in case of anti-bot, it loops until the challenge is completed by hand
-        while(My.isDisplayed(By.cssSelector(".a-padding-extra-large"), driver)){}
+        // in case of anti-bot, uncomment the code below, it loops until the challenge is completed by hand
+        //while(My.isDisplayed(By.cssSelector(".a-padding-extra-large"), driver)){}
 
         driver.findElement(By.cssSelector("input#twotabsearchtextbox")).sendKeys("laptop");
         driver.findElement(By.cssSelector("input#nav-search-submit-button")).click();

@@ -20,6 +20,7 @@ import java.util.Objects;
 
 // the class has a short name intentionally for convenience
 public class My {
+    // faster and more convenient time sleep
     public static void timeSleep(double seconds){
         int intSeconds = (int) seconds * 1000;
         try{
@@ -27,11 +28,13 @@ public class My {
         }catch (InterruptedException ignore){}
     }
 
+    // check if element is displayed without throwing errors
     public static boolean isDisplayed(By selector, WebDriver driver){
         List<WebElement> elements = driver.findElements(selector);
         return !elements.isEmpty();
     }
 
+    // best way to get url info for current tasks
     public static String urlStatus(String url, String title, WebDriver driver){
         final String GET_RESPONSE_CODE_SCRIPT =
                 "var xhr = new XMLHttpRequest();" +
@@ -51,6 +54,7 @@ public class My {
 
     }
 
+    // unsatisfying results
     public static String linkStatus(String url, String title){
         try {
             HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
@@ -71,6 +75,7 @@ public class My {
         }
     }
 
+    // unsatisfying results
     public static String requests(String url, String title){
         try{
             Connection con = Jsoup.connect(url);
