@@ -73,6 +73,7 @@ public class TestAmazonCrawl {
             // back to initial items so we can loop again
             allSubLinks.get(0).click();
         }
+        driver.manage().window().minimize();
 
         // store items in an array to be written later
         ArrayList<String> results = new ArrayList<>();
@@ -81,7 +82,7 @@ public class TestAmazonCrawl {
             System.out.println(My.urlStatus(urlData.get(i), categoryName.get(i), driver));
         }
 
-        // write the files
+        // write to the file
         My.writeResults(results);
     }
 
