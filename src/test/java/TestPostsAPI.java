@@ -9,8 +9,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 public class TestPostsAPI {
     private URL url;
@@ -30,8 +29,6 @@ public class TestPostsAPI {
 
     @Test
     public void testPostsAPI() throws IOException, ParseException {
-        int status = con.getResponseCode();
-        //System.out.println(status);
         StringBuilder respInfo = new StringBuilder();
         Scanner scanner = new Scanner(url.openStream());
 
@@ -40,13 +37,38 @@ public class TestPostsAPI {
         }
         scanner.close();
 
-        //System.out.println(respInfo);
         JSONParser jsonParse = new JSONParser();
         JSONArray jsonArr = (JSONArray) jsonParse.parse(String.valueOf(respInfo));
 
-        for (Object parse : jsonArr){
-            JSONObject object = (JSONObject) parse;
+        HashMap<Object, List<Integer>> usrPosts = new HashMap<>();
+        JSONObject object2 = (JSONObject) jsonArr.get(1);;
+        List<Integer> ints = new ArrayList<>();
+        for (int i = 1; i <= jsonArr.size(); i++){
+            JSONObject object1 = (JSONObject) jsonArr.get(i-1);
 
+            if (i != jsonArr.size()) {
+                object2 = (JSONObject) jsonArr.get(i);
+            }
+            if(object1.get("userId").equals(object2.get("userId"))){
+                ints.add(Integer.valueOf(object1.get("id").toString()));
+                if(i== jsonArr.size()){
+                    usrPosts.put(object1.get("userId"), ints);
+                }
+            }else {
+                ints.add(Integer.valueOf(object1.get("id").toString()));
+                usrPosts.put(object1.get("userId"), ints);
+                ints = new ArrayList<>();
+            }
         }
+    }
+    public static boolean areDistinct(Integer[] arr)
+    {
+        // Put all array elements in a HashSet
+        Set<Integer> s =
+                new HashSet<Integer>(Arrays.asList(arr));
+
+        // If all elements are distinct, size of
+        // HashSet should be same array.
+        return (s.size() == arr.length);
     }
 }
