@@ -43,14 +43,18 @@ public class TestAmazonCrawl {
 
         WebElement eles = driver.findElement(By.cssSelector("#nav-hamburger-menu"));
         wait.until(ExpectedConditions.elementToBeClickable(eles));
-        new Actions(driver).click(eles).click(eles).perform();
+        new Actions(driver).click(eles).perform();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("li:nth-of-type(11) > .hmenu-compressed-btn.hmenu-item")));
+        driver.findElement(By.cssSelector("li:nth-of-type(11) > .hmenu-compressed-btn.hmenu-item")).click();
 
         List<WebElement> allMainLinks = new ArrayList<>();
         ArrayList<String> urlData = new ArrayList<>();
         List<WebElement> allSubLinks = new ArrayList<>();
+        ArrayList<String> categoryName = new ArrayList<>();
         for (int i = 5; i <= 26; i++){
             My.timeSleep(1);
             WebElement ele = driver.findElement(By.cssSelector(String.format("[data-menu-id] [data-menu-id='%d']", i)));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", ele);
             wait.until(ExpectedConditions.elementToBeClickable(ele));
             //ele.click();
             new Actions(driver).click(ele).perform();
@@ -60,13 +64,16 @@ public class TestAmazonCrawl {
             //dropdown menu is intercepted, and elements are duplicated, so we start from the working link
             for (int j = 1; j < allSubLinks.size(); j++){
                 String link = allSubLinks.get(j).getAttribute("href");
+                String titleCategory = allSubLinks.get(j).getText();
                 urlData.add(link);
+                categoryName.add(titleCategory);
             }
             allSubLinks.get(0).click();
         }
 
-        for (String string : urlData){
-           System.out.println(string);
+        ArrayList<String> results = new ArrayList<>();
+        for(int i = 0; i< urlData.size();i++){
+            results.add(My.urlStatus(urlData.get(i), categoryName.get(i), driver));
         }
 
     }

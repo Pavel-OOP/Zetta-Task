@@ -2,6 +2,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -31,27 +32,43 @@ public class My {
         return !elements.isEmpty();
     }
 
-    public static String linkStatus(String URLName){
+    public static String urlStatus(String url, String title, WebDriver driver){
+        final String GET_RESPONSE_CODE_SCRIPT =
+                "var xhr = new XMLHttpRequest();" +
+                        "xhr.open('GET', arguments[0], false);" +
+                        "xhr.send(null);" +
+                        "return xhr.status";
+
+        JavascriptExecutor javascriptExecutor = (JavascriptExecutor) driver;
+        String statusInfo = javascriptExecutor.executeScript(GET_RESPONSE_CODE_SCRIPT, url).toString();
+
+        return "Link: "+ url + "\n" + "Title: " + title + "\n" + "Status: "+ statusInfo + "\n";
+
+    }
+
+    public static String linkStatus(String url, String title){
         try {
-            HttpURLConnection.setFollowRedirects(false);
-            HttpURLConnection con = (HttpURLConnection) new URL(URLName).openConnection();
+            HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
             con.setRequestMethod("HEAD");
+            con.connect();
+            String statusInfo;
+            System.out.println(con.getResponseCode());
             if(con.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                return "OK";
+                statusInfo = "OK";
             } else {
-                return "Dead link";
+                statusInfo = "Dead link";
             }
+            return "Link: "+ url + "\n" + "Title: " + title + "\n" + "Status: "+ statusInfo + "\n";
         }
         catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return "Failed Connection";
         }
     }
 
-    public static String requests(String url){
+    public static String requests(String url, String title){
         try{
             Connection con = Jsoup.connect(url);
-            Document doc = con.get();
             String statusInfo;
 
             if (con.response().statusCode() == 200){
@@ -60,16 +77,15 @@ public class My {
                 statusInfo = "Dead link";
             }
 
-            return "Link: "+ url + "\n" + "Title: " + doc.title() + "\n" + "Status: "+ statusInfo + "\n";
+            return "Link: "+ url + "\n" + "Title: " + title + "\n" + "Status: "+ statusInfo + "\n";
 
-        } catch (IOException e){
-            return "Exception occurred";
+        }catch (Exception e){
+            return "Exception occured";
         }
-
     }
 
 
-    public static void writeResults(String data) {
+    public static void writeResults(ArrayList<String> data) {
         final SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
         Date date = new Date();
         Timestamp timeStamp = new Timestamp(date.getTime());
@@ -83,16 +99,20 @@ public class My {
             File tempfile = new File(System.getProperty("user.dir") + File.separator + "tmp", filename);
             output = new BufferedWriter(new FileWriter(tempfile));
 
-            output.write(data);
+            for (String info : data){
+                output.write(info);
+            }
 
         } catch ( IOException e ) {
             e.printStackTrace();
+            System.out.println("There was a problem with write function");
         } finally {
             if ( output != null ) {
                 try {
                     output.close();
                 }catch (IOException e){
                     e.printStackTrace();
+                    System.out.println("There was a problem closing the file");
                 }
             }
         }
