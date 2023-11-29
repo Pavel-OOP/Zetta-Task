@@ -1,6 +1,5 @@
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -17,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 // the class has a short name intentionally for convenience
 public class My {
@@ -41,6 +41,11 @@ public class My {
 
         JavascriptExecutor javascriptExecutor = (JavascriptExecutor) driver;
         String statusInfo = javascriptExecutor.executeScript(GET_RESPONSE_CODE_SCRIPT, url).toString();
+        if(Objects.equals(statusInfo, "200")){
+            statusInfo = "OK";
+        }else {
+            statusInfo = "Dead link";
+        }
 
         return "Link: "+ url + "\n" + "Title: " + title + "\n" + "Status: "+ statusInfo + "\n";
 
@@ -97,7 +102,7 @@ public class My {
         try {
             new File("tmp").mkdirs();
             File tempfile = new File(System.getProperty("user.dir") + File.separator + "tmp", filename);
-            output = new BufferedWriter(new FileWriter(tempfile));
+            output = new BufferedWriter(new FileWriter(tempfile, true));
 
             for (String info : data){
                 output.write(info);

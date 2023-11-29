@@ -1,6 +1,3 @@
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,12 +6,10 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +69,10 @@ public class TestAmazonCrawl {
         ArrayList<String> results = new ArrayList<>();
         for(int i = 0; i< urlData.size();i++){
             results.add(My.urlStatus(urlData.get(i), categoryName.get(i), driver));
+            System.out.println(My.urlStatus(urlData.get(i), categoryName.get(i), driver));
         }
+
+        My.writeResults(results);
 
     }
 
