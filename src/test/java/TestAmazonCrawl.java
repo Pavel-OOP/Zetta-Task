@@ -41,9 +41,11 @@ public class TestAmazonCrawl {
         WebElement eles = driver.findElement(By.cssSelector("#nav-hamburger-menu"));
         wait.until(ExpectedConditions.elementToBeClickable(eles));
         new Actions(driver).click(eles).perform();
+
         //expand the desired items
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("li:nth-of-type(11) > .hmenu-compressed-btn.hmenu-item")));
         driver.findElement(By.cssSelector("li:nth-of-type(11) > .hmenu-compressed-btn.hmenu-item")).click();
+
         //loop through the desired items and get needed info like url and title
         List<WebElement> allMainLinks = new ArrayList<>();
         ArrayList<String> urlData = new ArrayList<>();
@@ -54,10 +56,14 @@ public class TestAmazonCrawl {
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", ele);
             wait.until(ExpectedConditions.elementToBeClickable(ele));
             new Actions(driver).click(ele).perform();
-            allSubLinks = driver.findElement(By.cssSelector(String.format("#hmenu-content [data-menu-id='%d']:nth-of-type(%d)", i, i))).findElements(By.cssSelector("li > a"));
+            allSubLinks = driver
+                    .findElement(By.cssSelector(String.format("#hmenu-content [data-menu-id='%d']:nth-of-type(%d)", i, i)))
+                    .findElements(By.cssSelector("li > a"));
+
             // we need time sleep for the elements to be loaded properly, wait.until sometimes give undersirable results
             My.timeSleep(1);
             for (int j = 1; j < allSubLinks.size(); j++){
+
                 // loop through elements and get needed info
                 String link = allSubLinks.get(j).getAttribute("href");
                 String titleCategory = allSubLinks.get(j).getText();
@@ -74,9 +80,9 @@ public class TestAmazonCrawl {
             results.add(My.urlStatus(urlData.get(i), categoryName.get(i), driver));
             System.out.println(My.urlStatus(urlData.get(i), categoryName.get(i), driver));
         }
+
         // write the files
         My.writeResults(results);
-
     }
 
     @After
