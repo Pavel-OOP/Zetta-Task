@@ -1,3 +1,5 @@
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -5,6 +7,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class TestPostsAPI {
@@ -26,6 +29,14 @@ public class TestPostsAPI {
                 respInfo.append(scanner.nextLine());
             }
             scanner.close();
+
+            //System.out.println(respInfo);
+            JSONParser jsonParse = new JSONParser();
+            JSONArray jsonArr = (JSONArray) jsonParse.parse(String.valueOf(respInfo));
+
+            for (Object parse : jsonArr){
+                System.out.println(parse.toString());
+            }
 
         }catch (Exception e){
             e.printStackTrace();
