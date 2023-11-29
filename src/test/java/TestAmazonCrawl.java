@@ -28,7 +28,7 @@ public class TestAmazonCrawl {
     }
 
     @Test
-    public void shopByDepartmentCrawl(){
+    public void testShopByDepartmentCrawl(){
         driver.get(url);
         // in case of anti-bot, uncomment the code below, it loops until the challenge is completed by hand
         //while(My.isDisplayed(By.cssSelector(".a-padding-extra-large"), driver)){}
