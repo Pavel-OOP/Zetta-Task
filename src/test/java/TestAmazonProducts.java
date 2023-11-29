@@ -27,7 +27,7 @@ public class TestAmazonProducts {
     }
 
     @Test
-    public void nonDiscountedLaptops() {
+    public void testNonDiscountedLaptops() {
         driver.get(url);
         // in case of anti-bot, uncomment the code below, it loops until the challenge is completed by hand
         //while(My.isDisplayed(By.cssSelector(".a-padding-extra-large"), driver)){}
